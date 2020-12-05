@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,11 +16,16 @@ import com.solucionexpress.microservicios.commons.examenes.models.entity.Examen;
 import com.solucionexpress.microservicios.app.examenes.services.ExamenService;
 import com.solucionexpress.microservicios.commons.controllers.CommonController;
 
+import javax.validation.Valid;
+
 @RestController
 public class ExamenController extends CommonController <Examen,ExamenService>{
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<?> editar(@RequestBody Examen examen,@PathVariable Long id){
+	public ResponseEntity<?> editar(@Valid @RequestBody Examen examen, BindingResult result, @PathVariable Long id){
+		if (result.hasErrors() ){
+			return this.validar(result);
+		}
 		Optional<Examen> o = service.findById(id);
 		if(!o.isPresent()) {
 			return ResponseEntity.notFound().build();
